@@ -7,7 +7,7 @@ attribute float x;
 """
 @cdecorator.transpiler('var')
 def var():
-    x : Attribute[float]
+    x : attribute[float]
 
 
 
@@ -19,10 +19,10 @@ varying float v_intensity;
 """
 @cdecorator.transpiler('vars')
 def vars_():
-    x : Attribute[float]
-    y : Attribute[float]
-    intensity : Attribute[float]
-    v_intensity : Varying[float]
+    x : attribute[float]
+    y : attribute[float]
+    intensity : attribute[float]
+    v_intensity : varying[float]
 
 
 
@@ -31,24 +31,20 @@ VERTEX = """
 attribute float x;
 attribute float y;
 attribute float intensity;
-
 varying float v_intensity;
-void main (void)
-{
-    v_intensity = intensity;
-    gl_Position = vec4(x, y, 0.0, 1.0);
-}
+v_intensity = intensity;
+gl_Position = vec4(x, y, 0.0, 1.0);
 """
 @cdecorator.transpiler('vertex')
 def vertex():
-    x : Attribute[float]
-    y : Attribute[float]
-    intensity : Attribute[float]
-    v_intensity : Varying[float]
+    x : attribute[float]
+    y : attribute[float]
+    intensity : attribute[float]
+    v_intensity : varying[float]
 
     #def main() -> void:
-    #    v_intensity = intensity
-    #    gl_Position = vec(x, y, 0.0, 1.0)
+    v_intensity = intensity
+    gl_Position = vec4(x, y, 0.0, 1.0)
 
 
 
@@ -64,8 +60,7 @@ void main()
 @cdecorator.transpiler('fragment')
 def fragment():
     v_intensity : Varying[float]
-    #def main() -> void:
-        #gl_FragColor = vec4(0, v_intensity, 0, 1)
+    gl_FragColor = vec4(0, v_intensity, 0, 1)
 
 
 
@@ -81,9 +76,7 @@ class CDecoratorDecoratorsTest(unittest.TestCase):
         self.eqcode(VARS, vars_())
 
     def test_vertex(self):
-        #self.eqcode(VERTEX, _vertex())
-        pass
-
+        self.eqcode(VERTEX, vertex())
 
 
 if __name__ == '__main__':

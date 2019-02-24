@@ -1,13 +1,17 @@
 import unittest
 import cdecorator
 
+CALL = """
+float x = f(3);
+"""
+def call():
+    x : float = f(3)
 
 VAR = """
 attribute float x;
 """
 def var():
-    x : Attribute[float]
-
+    x : attribute[float]
 
 
 VARS = """
@@ -17,29 +21,38 @@ attribute float intensity;
 varying float v_intensity;
 """
 def vars_():
-    x : Attribute[float]
-    y : Attribute[float]
-    intensity : Attribute[float]
-    v_intensity : Varying[float]
+    x : attribute[float]
+    y : attribute[float]
+    intensity : attribute[float]
+    v_intensity : varying[float]
 
 
 FUN = """
 void main() {
-return 0;
+float x = f(3);
+return x;
 }
 """
 def fun():
     def main() -> void:
-        return 0
+        x : float = f(3)
+        return x
 
 
-
-
+def strip(s):
+    if '\n' in s:
+        return '\n'.join( [ strip(l.strip()) for l in s.split('\n')  ] )
+    while '  ' in s:
+        s.replace('  ', ' ')
+    return s.strip()
 
 class CDecoratorTest(unittest.TestCase):
 
     def eqcode(self, act, exp):
-        return self.assertEqual(act.strip(), exp.strip())
+        return self.assertEqual(strip(act.strip()), strip(exp.strip()))
+
+    def test_call(self):
+        self.eqcode(CALL, cdecorator.transpile(call))
 
     def test_var(self):
         self.eqcode(VAR, cdecorator.transpile(var))
