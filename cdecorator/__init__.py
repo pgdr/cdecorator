@@ -42,7 +42,7 @@ def annassign(expr):
         print(e)
 
     if value:
-        value = _HANDLE[type(value)](value)
+        value = handle(value)
     try:
         slice_ = expr.annotation.slice.value.id
     except:
@@ -58,7 +58,7 @@ def functiondef(expr):
     fname = expr.name
     ass_ = []
     for x in expr.body:
-        ass_.append(_HANDLE[type(x)](x))
+        ass_.append(handle(x))
     body = '\n    '.join(ass_)
     return f'void {fname}() ' + '{\n' + body + '\n}'
 
@@ -82,7 +82,7 @@ def transpile(func):
     exprs = []
 
     for expr in body:
-        res = _HANDLE[type(expr)](expr)
+        res = handle(expr)
         exprs.append(res)
 
     return '\n'.join(exprs).strip()
