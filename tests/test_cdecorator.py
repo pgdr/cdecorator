@@ -38,6 +38,25 @@ def fun():
         x : float = f(3)
         return x
 
+VERTEX = """
+attribute float x;
+attribute float y;
+attribute float intensity;
+varying float v_intensity;
+void main() {
+    v_intensity = intensity;
+    gl_Position = vec4(x, y, 0.0, 1.0);
+}
+"""
+def vertex():
+    x : attribute[float]
+    y : attribute[float]
+    intensity : attribute[float]
+    v_intensity : varying[float]
+    def main() -> void:
+        v_intensity = intensity
+        gl_Position = vec4(x, y, 0.0, 1.0)
+
 
 def strip(s):
     if '\n' in s:
@@ -62,6 +81,9 @@ class CDecoratorTest(unittest.TestCase):
 
     def test_fun(self):
         self.eqcode(FUN, cdecorator.transpile(fun))
+
+    def test_vertex(self):
+        self.eqcode(VERTEX, cdecorator.transpile(vertex))
 
 
 if __name__ == '__main__':
