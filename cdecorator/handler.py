@@ -16,8 +16,6 @@ def ast_num(expr):
     return f'{expr.n}'
 
 def ast_constant(expr):  # new in Python 3.6
-    if expr.n == Ellipsis:
-        return '<'
     return f'{expr.n}'
 
 def ast_index(expr):

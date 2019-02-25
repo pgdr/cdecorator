@@ -28,7 +28,7 @@ def math():
     v_normal : varying[vec3]
     v_position : varying[vec3]
     def main():
-        gl_Position = ...@transform  # ugly, thanks, I know
+        gl_Position = 0@transform  # ugly, thanks, I know
         P : vec4 = m_view * m_model * vec4(position, 1.0)
         v_position = P.xyz / P.w
         v_normal = vec3(m_normal * vec4(normal,0.0))
