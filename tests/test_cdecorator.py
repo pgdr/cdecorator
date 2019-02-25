@@ -58,6 +58,17 @@ def vertex():
         gl_Position = vec4(x, y, 0.0, 1.0)
 
 
+FRAGMENT = """
+varying float v_intensity;
+void main() {
+    gl_FragColor = vec4(0, v_intensity, 0, 1);
+}
+"""
+def fragment():
+    v_intensity : varying[float]
+    def main() -> void:
+        gl_FragColor = vec4(0,v_intensity,0,1)
+
 def strip(s):
     if '\n' in s:
         return '\n'.join( [ strip(l.strip()) for l in s.split('\n')  ] )
@@ -84,6 +95,9 @@ class CDecoratorTest(unittest.TestCase):
 
     def test_vertex(self):
         self.eqcode(VERTEX, cdecorator.transpile(vertex))
+
+    def test_fragment(self):
+        self.eqcode(FRAGMENT, cdecorator.transpile(fragment))
 
 
 if __name__ == '__main__':
