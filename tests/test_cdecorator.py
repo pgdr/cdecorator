@@ -1,5 +1,6 @@
 import unittest
 import cdecorator
+from . import strip
 
 CALL = """
 float x = f(3);
@@ -43,7 +44,7 @@ attribute float x;
 attribute float y;
 attribute float intensity;
 varying float v_intensity;
-void main() {
+void main(void) {
     v_intensity = intensity;
     gl_Position = vec4(x, y, 0.0, 1.0);
 }
@@ -53,7 +54,7 @@ def vertex():
     y : attribute[float]
     intensity : attribute[float]
     v_intensity : varying[float]
-    def main() -> void:
+    def main(void) -> void:
         v_intensity = intensity
         gl_Position = vec4(x, y, 0.0, 1.0)
 
@@ -69,12 +70,6 @@ def fragment():
     def main() -> void:
         gl_FragColor = vec4(0,v_intensity,0,1)
 
-def strip(s):
-    if '\n' in s:
-        return '\n'.join( [ strip(l.strip()) for l in s.split('\n')  ] )
-    while '  ' in s:
-        s.replace('  ', ' ')
-    return s.strip()
 
 class CDecoratorTest(unittest.TestCase):
 

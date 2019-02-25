@@ -1,5 +1,6 @@
 import unittest
 import cdecorator
+from . import strip
 
 
 VAR = """
@@ -67,7 +68,7 @@ def fragment():
 class CDecoratorDecoratorsTest(unittest.TestCase):
 
     def eqcode(self, act, exp):
-        return self.assertEqual(act.strip(), exp.strip())
+        return self.assertEqual(strip(act.strip()), strip(exp.strip()))
 
     def test_var(self):
         self.eqcode(VAR, var())
