@@ -6,7 +6,7 @@ from . import strip
 VAR = """
 attribute float x;
 """
-@cdecorator.transpiler('var')
+@cdecorator.transpiler
 def var():
     x : attribute[float]
 
@@ -18,7 +18,7 @@ attribute float y;
 attribute float intensity;
 varying float v_intensity;
 """
-@cdecorator.transpiler('vars')
+@cdecorator.transpiler
 def vars_():
     x : attribute[float]
     y : attribute[float]
@@ -36,7 +36,7 @@ varying float v_intensity;
 v_intensity = intensity;
 gl_Position = vec4(x, y, 0.0, 1.0);
 """
-@cdecorator.transpiler('vertex')
+@cdecorator.transpiler
 def vertex():
     x : attribute[float]
     y : attribute[float]
@@ -58,7 +58,7 @@ void main()
     gl_FragColor = vec4(0,v_intensity,0,1);
 }
 """
-@cdecorator.transpiler('fragment')
+@cdecorator.transpiler
 def fragment():
     v_intensity : Varying[float]
     gl_FragColor = vec4(0, v_intensity, 0, 1)
@@ -71,13 +71,13 @@ class CDecoratorDecoratorsTest(unittest.TestCase):
         return self.assertEqual(strip(act.strip()), strip(exp.strip()))
 
     def test_var(self):
-        self.eqcode(VAR, var())
+        self.eqcode(VAR, var)
 
     def test_vars(self):
-        self.eqcode(VARS, vars_())
+        self.eqcode(VARS, vars_)
 
     def test_vertex(self):
-        self.eqcode(VERTEX, vertex())
+        self.eqcode(VERTEX, vertex)
 
 
 if __name__ == '__main__':

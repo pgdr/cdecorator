@@ -18,9 +18,15 @@ def transpile(func):
 
     return '\n'.join(exprs).strip()
 
-def transpiler(name):
-    def wrapper(f):
-        def inner():
-            return transpile(f)
-        return inner
-    return wrapper
+class _callable_str:
+    def __init__(self, s):
+        self.s = s
+    def __call__(self, *args, **kwargs):
+        return self.s
+    def __str__(self):
+        return self.s
+    def __repr__(self):
+        return self.s
+
+def transpiler(f):
+    return transpile(f)
