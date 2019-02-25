@@ -28,6 +28,13 @@ def vars_():
     v_intensity : varying[float]
 
 
+VARASS = """
+const float x = 3.0;
+"""
+def varass():
+    x : const[float] = 3.0
+
+
 FUN = """
 void main() {
 float x = f(3);
@@ -81,6 +88,9 @@ class CDecoratorTest(unittest.TestCase):
 
     def test_var(self):
         self.eqcode(VAR, cdecorator.transpile(var))
+
+    def test_varass(self):
+        self.eqcode(VARASS, cdecorator.transpile(varass))
 
     def test_vars(self):
         self.eqcode(VARS, cdecorator.transpile(vars_))

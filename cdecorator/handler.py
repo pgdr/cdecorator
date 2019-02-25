@@ -31,35 +31,45 @@ def ast_call(expr):
     return _strip(f'{expr.func.id}({args})')
 
 def ast_subscript(expr):
-    return _strip(f'{handle(expr.value)} {handle(expr.slice)}')
+    slic = handle(expr.slice)
+    val = handle(expr.value)
+    return _strip(f'{val} {slic}')
 
 def ast_return(expr):
     return f'return {handle(expr.value)};'
 
 def ast_annassign(expr):
-    target = expr.target.id
+    target = handle(expr.target)
     ann = handle(expr.annotation)
-    value = ''
-    try:
-        value = expr.value
-    except Exception as e:
-        print(e)
+    value = handle(expr.value) if expr.value is not None else ''
 
-    if value:
-        value = handle(value)
     try:
         slice_ = expr.annotation.slice.value.id
     except:
         slice_ = ''
     if value:
-        return _strip('{} {} {} = {};'.format(ann, target, slice_, value))
+        return _strip('{} {} = {};'.format(ann, target, value))
     return _strip('{} {};'.format(ann, target))
 
 def ast_compare(expr):
     left = handle(expr.left)
     comps = [handle(comp) for comp in expr.comparators]
     ops = [handle(op) for op in expr.ops]
-    return f'{left} OP {comps[0]}'
+    return f'{left} {ops[0]} {comps[0]}'
+
+
+def ast_if(expr):
+    test = handle(expr.test)
+    body = [handle(line) for line in expr.body]
+    orelse = expr.orelse
+    return f'if ({test}) ' + '{\n' + '\n'.join(body) + '\n}'
+
+
+def ast_unaryop(expr):
+    operand = handle(expr.operand)
+    op = handle(expr.op)
+    return f'{op} {operand}'
+
 
 def ast_binop(expr):
     left  = handle(expr.left)
@@ -109,6 +119,9 @@ def ast_functiondef(expr):
     return f'void {fname}({", ".join(args)}) ' + '{\n' + body + '\n}'
 
 
+def constant(elt):
+    return lambda _ : elt
+
 _HANDLE[ast.AnnAssign]   = ast_annassign
 _HANDLE[ast.Assign]      = ast_assign
 _HANDLE[ast.FunctionDef] = ast_functiondef
@@ -122,11 +135,15 @@ _HANDLE[ast.Constant]    = ast_constant
 _HANDLE[ast.Index]       = ast_index
 _HANDLE[ast.arguments]   = ast_arguments
 _HANDLE[ast.arg]         = ast_arg
+_HANDLE[ast.If]          = ast_if
+_HANDLE[ast.UnaryOp]     = ast_unaryop
 _HANDLE[ast.BinOp]       = ast_binop
 _HANDLE[ast.Attribute]   = ast_attribute
-_HANDLE[ast.Lt]          = lambda _ : '<'
-_HANDLE[ast.Gt]          = lambda _ : '>'
-_HANDLE[ast.Mult]        = lambda _ : '*'
-_HANDLE[ast.Div]         = lambda _ : '/'
-_HANDLE[ast.Add]         = lambda _ : '+'
+_HANDLE[ast.Lt]          = constant('<')
+_HANDLE[ast.Gt]          = constant('>')
+_HANDLE[ast.Mult]        = constant('*')
+_HANDLE[ast.Div]         = constant('/')
+_HANDLE[ast.Add]         = constant('+')
+_HANDLE[ast.Sub]         = constant('-')
+_HANDLE[ast.USub]        = constant('-')
 _HANDLE[ast.MatMult]     = ast_matmult
