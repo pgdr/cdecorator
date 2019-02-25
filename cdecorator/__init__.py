@@ -16,6 +16,9 @@ def _strip(s):
 def num(expr):
     return f'{expr.n}'
 
+def constant(expr):  # new in Python 3.6
+    return f'{expr.n}'
+
 def index(expr):
     return expr.value.id
 
@@ -70,6 +73,7 @@ _HANDLE[ast.Call]        = call
 _HANDLE[ast.Subscript]   = subscript
 _HANDLE[ast.Name]        = name
 _HANDLE[ast.Num]         = num
+_HANDLE[ast.Constant]    = constant
 _HANDLE[ast.Index]       = index
 
 
