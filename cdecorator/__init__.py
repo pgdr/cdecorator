@@ -4,6 +4,20 @@ import inspect
 from .handler import handle
 
 
+def compile(func):
+    import os
+    import tempfile
+    fname = tempfile.NamedTemporaryFile(delete=False, suffix='.c')
+    out   = tempfile.NamedTemporaryFile(delete=False, suffix='.out')
+    source = transpile(func)
+    with open(fname.name, 'w') as f:
+        f.write(source)
+    cmd = ' '.join(['gcc', '-fPIC',  '--shared', fname.name, '-o', out.name])
+    os.system(cmd)
+    import ctypes
+    return ctypes.cdll.LoadLibrary(out.name)
+
+
 def transpile(func):
     tree = ast.parse(inspect.getsource(func))
     fdef = tree.body[0]

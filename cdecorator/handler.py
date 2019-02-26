@@ -20,7 +20,10 @@ def _transformer(expr):
 
 def _include(expr):
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
-    return _strip(f'#include "{args}"')
+    if args.startswith('"<'):
+        args = args[1:-1]
+        return _strip(f'#include {args}')
+    return _strip(f'#include {args}')
 
 
 def ast_num(expr):
@@ -28,7 +31,7 @@ def ast_num(expr):
 
 
 def ast_str(expr):
-    return f'{expr.s}'
+    return f'"{expr.s}"'
 
 
 def ast_constant(expr):  # new in Python 3.6
@@ -142,6 +145,7 @@ def ast_arguments(expr):
 
 
 def ast_functiondef(expr):
+    returns = handle(expr.returns) if expr.returns else 'void'
     fname = expr.name
     args = expr.args.args
     if args:
@@ -150,7 +154,7 @@ def ast_functiondef(expr):
     for x in expr.body:
         ass_.append(handle(x))
     body = '\n    '.join(ass_)
-    return f'void {fname}({", ".join(args)}) ' + '{\n' + body + '\n}'
+    return f'{returns} {fname}({", ".join(args)}) ' + '{\n' + body + '\n}'
 
 
 def constant(elt):
