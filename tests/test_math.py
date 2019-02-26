@@ -28,7 +28,7 @@ def math():
     v_normal : varying[vec3]
     v_position : varying[vec3]
     def main():
-        gl_Position = 0@transform  # ugly, thanks, I know
+        gl_Position = _(transform)  # ugly, thanks, I know
         P : vec4 = m_view * m_model * vec4(position, 1.0)
         v_position = P.xyz / P.w
         v_normal = vec3(m_normal * vec4(normal,0.0))
@@ -96,30 +96,21 @@ def fragment():
 
 TRANSFORMERS = """
 uniform vec3 light_position;
-
 attribute vec3 position;
 attribute vec3 color;
 attribute float radius;
-
 varying float v_size;
 varying vec3 v_color;
 varying float v_radius;
 varying vec4 v_eye_position;
 varying vec3 v_light_direction;
-
-void main (void)
-{
+void main(void) {
     v_color = color;
     v_radius = radius;
-    v_eye_position = <transform.trackball_view> *
-                     <transform.trackball_model> *
-                     vec4(position,1.0);
+    v_eye_position = <transform.trackball_view> * <transform.trackball_model> * vec4(position,1.0);
     v_light_direction = normalize(light_position);
     gl_Position = <transform(position)>;
-    // stackoverflow.com/questions/8608844/...
-    //  ... resizing-point-sprites-based-on-distance-from-the-camera
-    vec4 p = <transform.trackball_projection> *
-             vec4(radius, radius, v_eye_position.z, v_eye_position.w);
+    vec4 p = <transform.trackball_projection> * vec4(radius, radius, v_eye_position.z, v_eye_position.w);
     v_size = 512.0 * p.x / p.w;
     gl_PointSize = v_size + 5.0;
 }
@@ -139,11 +130,11 @@ def transformers():
     def main(void) -> void:
         v_color = color
         v_radius = radius
-        v_eye_position = 0@transform.trackball_view  * 0@transform.trackball_model * vec4(position, 1.0)
+        v_eye_position = _(transform.trackball_view)  * _(transform.trackball_model) * vec4(position, 1.0)
         v_light_direction = normalize(light_position)
-        gl_Position = 0@transform(position)
+        gl_Position = _(transform(position))
 
-        p : vec4 = 0@transform.trackball_projection * vec4(radius, radius, v_eye_position.z, v_eye_position.w)
+        p : vec4 = _(transform.trackball_projection) * vec4(radius, radius, v_eye_position.z, v_eye_position.w)
         v_size = 512.0 * p.x / p.w
         gl_PointSize = v_size + 5.0
 
@@ -166,9 +157,7 @@ class MathTest(unittest.TestCase):
         self.eqcode(FRAGMENT, cdecorator.transpile(fragment))
 
     def test_transformers(self):
-        # TODO
-        # self.eqcode(TRANSFORMERS, cdecorator.transpile(transformers))
-        pass
+        self.eqcode(TRANSFORMERS, cdecorator.transpile(transformers))
 
 
 if __name__ == '__main__':

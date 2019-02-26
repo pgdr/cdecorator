@@ -12,6 +12,11 @@ def _strip(s):
         s = s.replace('  ', ' ')
     return s.strip()
 
+
+def _transformer(expr):
+    args = ', '.join( [ handle(arg) for arg in expr.args ] )
+    return _strip(f'<{args}>')
+
 def ast_num(expr):
     return f'{expr.n}'
 
@@ -25,8 +30,11 @@ def ast_name(expr):
     return f'{expr.id}'
 
 def ast_call(expr):
+    func = handle(expr.func)
+    if func == '_':  # this is the <transformer> syntax
+        return _transformer(expr)
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
-    return _strip(f'{expr.func.id}({args})')
+    return _strip(f'{func}({args})')
 
 def ast_subscript(expr):
     slic = handle(expr.slice)
@@ -73,8 +81,6 @@ def ast_binop(expr):
     left  = handle(expr.left)
     right = handle(expr.right)
     op = handle(expr.op)
-    if op == '@':   # this is hijacked for <operator>
-        return f'<{right}>'
     return f'{left} {op} {right}'
 
 

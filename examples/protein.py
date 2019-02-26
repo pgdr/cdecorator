@@ -24,11 +24,11 @@ def vertex():
     def main(void) -> void:
         v_color = color
         v_radius = radius
-        v_eye_position = 0@transform.trackball_view  * 0@transform.trackball_model * vec4(position, 1.0)
+        v_eye_position = _(transform.trackball_view)  * _(transform.trackball_model) * vec4(position, 1.0)
         v_light_direction = normalize(light_position)
-        gl_Position = 0@transform(position)
+        gl_Position = _(transform(position))
 
-        p : vec4 = 0@transform.trackball_projection * vec4(radius, radius, v_eye_position.z, v_eye_position.w)
+        p : vec4 = _(transform.trackball_projection) * vec4(radius, radius, v_eye_position.z, v_eye_position.w)
         v_size = 512.0 * p.x / p.w
         gl_PointSize = v_size + 5.0
 
