@@ -187,7 +187,7 @@ def include():
         x : float = texcoord.x
         y : float = texcoord.y
         d : float = 1.0 - x*x - y*y
-        if (d <= 0.0):
+        if d <= 0.0:
             discard
         z : float = sqrt(d)
         pos : vec4 = v_eye_position;
