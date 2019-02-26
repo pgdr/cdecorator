@@ -17,22 +17,38 @@ def _transformer(expr):
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
     return _strip(f'<{args}>')
 
+
+def _include(expr):
+    args = ', '.join( [ handle(arg) for arg in expr.args ] )
+    return _strip(f'#include "{args}"')
+
+
 def ast_num(expr):
     return f'{expr.n}'
+
+
+def ast_str(expr):
+    return f'{expr.s}'
+
 
 def ast_constant(expr):  # new in Python 3.6
     return f'{expr.n}'
 
+
 def ast_index(expr):
     return expr.value.id
 
+
 def ast_name(expr):
     return f'{expr.id}'
+
 
 def ast_call(expr):
     func = handle(expr.func)
     if func == '_':  # this is the <transformer> syntax
         return _transformer(expr)
+    if func == '__include__':
+        return _include(expr)
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
     return _strip(f'{func}({args})')
 
@@ -94,10 +110,24 @@ def ast_attribute(expr):
     return f'{val}.{attr}'
 
 
+def ast_expr(expr):
+    val = handle(expr.value)
+    if val.startswith("#include"):
+        return f'{val}'
+    return f'{val};'
+
+
 def ast_assign(expr):
     t0 = handle(expr.targets[0])
     val = handle(expr.value)
     return f'{t0} = {val};'
+
+
+def ast_augassign(expr):
+    target = handle(expr.target)
+    op = handle(expr.op)
+    val = handle(expr.value)
+    return f'{target} {op} {val};'
 
 
 def ast_arg(expr):
@@ -128,6 +158,7 @@ def constant(elt):
 
 _HANDLE[ast.AnnAssign]   = ast_annassign
 _HANDLE[ast.Assign]      = ast_assign
+_HANDLE[ast.AugAssign]   = ast_augassign
 _HANDLE[ast.FunctionDef] = ast_functiondef
 _HANDLE[ast.Return]      = ast_return
 _HANDLE[ast.Call]        = ast_call
@@ -135,6 +166,7 @@ _HANDLE[ast.Compare]     = ast_compare
 _HANDLE[ast.Subscript]   = ast_subscript
 _HANDLE[ast.Name]        = ast_name
 _HANDLE[ast.Num]         = ast_num
+_HANDLE[ast.Str]         = ast_str
 _HANDLE[ast.Constant]    = ast_constant
 _HANDLE[ast.Index]       = ast_index
 _HANDLE[ast.arguments]   = ast_arguments
@@ -143,7 +175,9 @@ _HANDLE[ast.If]          = ast_if
 _HANDLE[ast.UnaryOp]     = ast_unaryop
 _HANDLE[ast.BinOp]       = ast_binop
 _HANDLE[ast.Attribute]   = ast_attribute
+_HANDLE[ast.Expr]        = ast_expr
 _HANDLE[ast.Lt]          = constant('<')
+_HANDLE[ast.LtE]         = constant('<=')
 _HANDLE[ast.Gt]          = constant('>')
 _HANDLE[ast.Mult]        = constant('*')
 _HANDLE[ast.Div]         = constant('/')
