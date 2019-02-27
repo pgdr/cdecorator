@@ -52,6 +52,8 @@ def ast_call(expr):
         return _transformer(expr)
     if func == '__include__':
         return _include(expr)
+    if func == 'print':
+        func = 'printf'  # close enough
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
     return _strip(f'{func}({args})')
 
@@ -75,6 +77,7 @@ def ast_annassign(expr):
     if value:
         return _strip('{} {} = {};'.format(ann, target, value))
     return _strip('{} {};'.format(ann, target))
+
 
 def ast_compare(expr):
     left = handle(expr.left)
@@ -135,6 +138,9 @@ def ast_augassign(expr):
 
 def ast_arg(expr):
     arg = handle(expr.arg)
+    if expr.annotation:
+        ann = handle(expr.annotation)
+        return f'{ann} {arg}'  # the space is annoying
     return f'{arg}'
 
 
@@ -146,19 +152,20 @@ def ast_arguments(expr):
 
 def ast_functiondef(expr):
     returns = handle(expr.returns) if expr.returns else 'void'
-    fname = expr.name
-    args = expr.args.args
-    if args:
-        args = [arg.arg for arg in args]
+    fname = expr.name if type(expr.name) == str else handle(expr.name)
+    args = handle(expr.args)
     ass_ = []
     for x in expr.body:
         ass_.append(handle(x))
     body = '\n    '.join(ass_)
-    return f'{returns} {fname}({", ".join(args)}) ' + '{\n' + body + '\n}'
+    return f'{returns} {fname}({args}) ' + '{\n' + body + '\n}'
 
 
 def constant(elt):
     return lambda _ : elt
+
+def identity(elt):
+    return elt
 
 _HANDLE[ast.AnnAssign]   = ast_annassign
 _HANDLE[ast.Assign]      = ast_assign
@@ -171,6 +178,7 @@ _HANDLE[ast.Subscript]   = ast_subscript
 _HANDLE[ast.Name]        = ast_name
 _HANDLE[ast.Num]         = ast_num
 _HANDLE[ast.Str]         = ast_str
+_HANDLE[str]             = identity
 _HANDLE[ast.Constant]    = ast_constant
 _HANDLE[ast.Index]       = ast_index
 _HANDLE[ast.arguments]   = ast_arguments

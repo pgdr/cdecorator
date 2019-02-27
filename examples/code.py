@@ -4,8 +4,15 @@ import cdecorator
 @cdecorator.compile
 def main():
     __include__('<stdio.h>')
+
+    def xyz(x : float) -> float:
+        print("lolercode\\n")
+        y : int = 4
+        return x*y
+
     def main() -> int:
-        printf("Hello, World!\\n")
+        print("%f\\n", xyz(2.123))
+        print("Hello, World!\\n")
         return 0
 
 
