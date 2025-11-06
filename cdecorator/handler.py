@@ -31,11 +31,22 @@ def ast_num(expr):
 
 
 def ast_str(expr):
-    return f'"{expr.s}"'
+    return f'"{expr.value}"'
 
 
-def ast_constant(expr):  # new in Python 3.6
-    return f'{expr.n}'
+
+def ast_constant(expr):
+    match expr.value:
+        case str():
+            return ast_str(expr)
+        case int():
+            return ast_num(expr)
+        case float():
+            return ast_float(expr)
+        case bool():
+            return ast_bool(expr)
+        case _:
+            raise ValueError(f"Unsupported type: {type(expr.value)} for {expr.value}")
 
 
 def ast_index(expr):
