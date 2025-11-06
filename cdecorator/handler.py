@@ -42,7 +42,7 @@ def ast_constant(expr):
         case int():
             return ast_num(expr)
         case float():
-            return ast_float(expr)
+            return ast_num(expr)
         case bool():
             return ast_bool(expr)
         case _:
