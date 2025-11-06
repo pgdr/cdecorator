@@ -81,13 +81,14 @@ def ast_annassign(expr):
     ann = handle(expr.annotation)
     value = handle(expr.value) if expr.value is not None else ''
 
-    try:
-        slice_ = expr.annotation.slice.value.id
-    except:
-        slice_ = ''
+    if ' ' in ann:
+        t1, t2 = ann.split()
+        ann = f'{t2} {t1}[]'
+    else:
+        ann = f"{ann} {target}"
     if value:
-        return _strip('{} {} = {};'.format(ann, target, value))
-    return _strip('{} {};'.format(ann, target))
+        return _strip('{} = {};'.format(ann, value))
+    return _strip('{};'.format(ann))
 
 
 def ast_compare(expr):
@@ -172,17 +173,36 @@ def ast_functiondef(expr):
     return f'{returns} {fname}({args}) ' + '{\n' + body + '\n}'
 
 
+def ast_for(expr):
+    # target iter body
+    t = expr.target.id
+    head = f"""for (int {t} = 0; {t} < n; {t}++)"""
+    ass_ = []
+    for x in expr.body:
+        ass_.append(handle(x))
+    body = '\n    '.join(ass_)
+    return f'{head}' + '{\n' + body + '\n}'
+
+def ast_tuple(expr):
+    elts = ', '.join(handle(x) for x in expr.elts)
+    return f'{{ {elts} }}'
+
 def constant(elt):
     return lambda _ : elt
 
 def identity(elt):
     return elt
 
+
+
+_HANDLE[ast.Tuple]       = ast_tuple
 _HANDLE[ast.AnnAssign]   = ast_annassign
 _HANDLE[ast.Assign]      = ast_assign
 _HANDLE[ast.AugAssign]   = ast_augassign
 _HANDLE[ast.FunctionDef] = ast_functiondef
+_HANDLE[ast.For]         = ast_for
 _HANDLE[ast.Return]      = ast_return
+_HANDLE[ast.Pass]        = lambda _ : ''
 _HANDLE[ast.Call]        = ast_call
 _HANDLE[ast.Compare]     = ast_compare
 _HANDLE[ast.Subscript]   = ast_subscript
