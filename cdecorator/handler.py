@@ -71,7 +71,7 @@ def ast_call(expr):
 def ast_subscript(expr):
     slic = handle(expr.slice)
     val = handle(expr.value)
-    return _strip(f'{val} {slic}')
+    return _strip(f'{val}[{slic}]')
 
 def ast_return(expr):
     return f'return {handle(expr.value)};'
@@ -81,9 +81,10 @@ def ast_annassign(expr):
     ann = handle(expr.annotation)
     value = handle(expr.value) if expr.value is not None else ''
 
-    if ' ' in ann:
+    if '[' in ann:
+        ann = ann.replace("[", " ").replace("]","")
         t1, t2 = ann.split()
-        ann = f'{t2} {t1}[]'
+        ann = f'{t2} {target}[]'
     else:
         ann = f"{ann} {target}"
     if value:
@@ -120,6 +121,9 @@ def ast_binop(expr):
 
 def ast_matmult(expr):
     return '@'
+
+def ast_mod(expr):
+    return '%'
 
 
 def ast_attribute(expr):
@@ -180,7 +184,7 @@ def ast_for(expr):
     ass_ = []
     for x in expr.body:
         ass_.append(handle(x))
-    body = '\n    '.join(ass_)
+    body = '    ' + '\n    '.join(ass_)
     return f'{head}' + '{\n' + body + '\n}'
 
 def ast_tuple(expr):
@@ -228,3 +232,4 @@ _HANDLE[ast.Add]         = constant('+')
 _HANDLE[ast.Sub]         = constant('-')
 _HANDLE[ast.USub]        = constant('-')
 _HANDLE[ast.MatMult]     = ast_matmult
+_HANDLE[ast.Mod]         = ast_mod

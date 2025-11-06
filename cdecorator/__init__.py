@@ -10,7 +10,7 @@ def compile(func):
     fname = tempfile.NamedTemporaryFile(delete=False, suffix='.c')
     out   = tempfile.NamedTemporaryFile(delete=False, suffix='.out')
     source = transpile(func)
-    print(source)
+    #print(source)
     with open(fname.name, 'w') as f:
         f.write(source)
     cmd = ' '.join(['gcc', '-fPIC',  '--shared', fname.name, '-o', out.name])
