@@ -63,9 +63,11 @@ def ast_call(expr):
         return _transformer(expr)
     if func == '__include__':
         return _include(expr)
-    if func == 'print':
-        func = 'printf'  # close enough
     args = ', '.join( [ handle(arg) for arg in expr.args ] )
+    if func == 'print':
+        N = len(expr.args)
+        s = "%d "*N
+        return _strip(f'printf("{s}\\n", {args})')
     return _strip(f'{func}({args})')
 
 def ast_subscript(expr):
@@ -149,6 +151,14 @@ def ast_augassign(expr):
     target = handle(expr.target)
     op = handle(expr.op)
     val = handle(expr.value)
+    if op == "+":
+        op = "+="
+    if op == "-":
+        op = "-="
+    if op == "*":
+        op = "*="
+    if op == "%":
+        op = "%="
     return f'{target} {op} {val};'
 
 

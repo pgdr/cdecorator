@@ -15,13 +15,15 @@ if sys.argv[1] == "t":
 
 @decorateif(comp)
 def C():
+    __include__("<stdio.h>")
+
     def main() -> int:
-        v: tuple[int] = (1, 2, 3)
+        v: tuple[int] = (1, 2, 3, 4, 5, 6)
         x: int = 0
-        n: int = 10
+        n: int = 6
         for i in (1, 2, 3):
-            x = x + i
-            x = x + v[i % 3]
+            x += v[i]
+            print(x,v[i])
         return x
 
 
